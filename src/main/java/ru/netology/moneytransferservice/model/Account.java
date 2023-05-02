@@ -10,4 +10,5 @@ import lombok.Setter;
 public class Account {
     private Card card;
     private int amount;
+    private String currency;
 }

@@ -1,7 +1,7 @@
 package ru.netology.moneytransferservice.repository;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.netology.moneytransferservice.model.Card;
 
-@Repository
-public class CardRepository {
+public interface CardRepository extends JpaRepository<Card, Integer> {
 }

@@ -1,7 +1,14 @@
 package ru.netology.moneytransferservice.servise;
 
-import org.springframework.stereotype.Service;
+import ru.netology.moneytransferservice.model.Account;
+import ru.netology.moneytransferservice.model.Card;
 
-@Service
-public class TransferService {
+public interface TransferService {
+
+    Card getCardByNumber(String cardNumber); //получаем данные карты по ее номеру
+
+    int getAccountBalance(Card card); //получаем баланс карты
+
+    boolean updateAccountBalance(Card card, int amount); //изменяем баланс карты
+
 }
