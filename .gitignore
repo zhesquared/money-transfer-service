@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+##script for db creation##
+sql_creations.txt
+db_values.txt

@@ -1,44 +1,123 @@
 package ru.netology.moneytransferservice.servise;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.netology.moneytransferservice.model.Account;
-import ru.netology.moneytransferservice.model.Card;
+import ru.netology.moneytransferservice.domain.Card;
+import ru.netology.moneytransferservice.domain.Transfer;
+import ru.netology.moneytransferservice.exceptions.InvalidCardDataException;
+import ru.netology.moneytransferservice.exceptions.InvalidConfirmationDataException;
 import ru.netology.moneytransferservice.repository.CardRepository;
+import ru.netology.moneytransferservice.repository.NewCardRepository;
+import ru.netology.moneytransferservice.repository.TransferRepository;
+import ru.netology.moneytransferservice.responce.OperationConfirmation;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Objects;
 
 @Service
 public class TransferServiceImpl implements TransferService {
 
-    private static final Map<Card, Account> ACCOUNT_REPO = new HashMap<>();
-
-    private static final AtomicLong CARD_ID_HOLDER = new AtomicLong(); //переменная для генерации номера операции
+    private final String verificationCode;
+    private final Double transferCommission;
+    private final TransferRepository transferRepository;
+    private final CardRepository cardRepository;
+    private static final Logger logger = LoggerFactory.getLogger("file-logger");
 
     @Autowired
-    private final CardRepository cardRepository;
+    private NewCardRepository newCardRepository;
 
-    public TransferServiceImpl(CardRepository cardRepository) {
+    @Autowired
+    public TransferServiceImpl(@Value("${verification.code:0000}") String verificationCode,
+                               @Value("${transfer.commission:0}") Double transferCommission,
+                               TransferRepository transferRepository,
+                               CardRepository cardRepository) {
+        this.verificationCode = verificationCode;
+        this.transferCommission = transferCommission;
+        this.transferRepository = transferRepository;
         this.cardRepository = cardRepository;
     }
 
     @Override
-    public Card getCardByNumber(String cardNumber) {
-        return cardRepository.getOne(Integer.valueOf(cardNumber));
+    public Long transfer(Transfer transfer) throws InvalidCardDataException { //перевод
+
+        String cardFromNumber = transfer.getCardFromNumber();
+        Card validCardFrom = cardRepository.getCardByNumber(cardFromNumber).orElseThrow(
+                () -> new InvalidCardDataException(
+                        "Карты с номером [" +
+                                cardFromNumber +
+                                "] не существует. Попробуйте еще раз.")
+        );
+
+        cardDataValidation(transfer, validCardFrom);
+
+        return transferRepository.addTransfer(transfer);
     }
 
     @Override
-    public int getAccountBalance(Card card) {
-        return ACCOUNT_REPO.get(card).getAmount();
-    }
+    public boolean transferConfirmation(OperationConfirmation confirmation) throws InvalidConfirmationDataException { //подтверждение
 
-    @Override
-    public boolean updateAccountBalance(Card card, int amount) {
+        if (!confirmation.getCode().equals(verificationCode)) {
+            throw new InvalidConfirmationDataException(
+                    "Неверный код подтверждения [" +
+                            confirmation.getCode() +
+                            "]!");
+        }
 
-        ACCOUNT_REPO.get(card).setAmount(amount); // реализовать проверку на положительный баланс
+        if (!transferRepository.confirmOperation(confirmation)) {
+            throw new InvalidConfirmationDataException(
+                    "Транзакции с идентификатором [" +
+                            confirmation.getOperationId() +
+                            "] не существует");
+        }
+
+        transferExecution(confirmation.getOperationId());
 
         return true;
+    }
+
+    @Override
+    public void transferExecution(String operationId) {
+
+        Transfer transfer = transferRepository.getTransferById(operationId);
+        Card validCardFrom = cardRepository.getCardByNumber(transfer.getCardFromNumber()).get();
+
+//        String transferCurrency = transfer.getAmount().getCurrency();
+//        Integer transferAmountWithCommission = (int) (transfer.getAmount().getValue() * (1 + transferCommission));
+//        Integer balance = validCardFrom.getAmounts().get(transferCurrency).getValue() - transferAmountWithCommission;
+
+//        validCardFrom.getAmounts().put(transferCurrency, new Amount(balance, transferCurrency));
+
+        logger.info("С карты {} успешно переведена сумма в размере {} на карту {}. Размер комиссии составил {} {}. " +
+                        "Остаток на карте: {} {}. ID операции: {}",
+//                transfer.getCardFromNumber(),
+//                transfer.getAmount(),
+//                transfer.getCardToNumber(),
+//                transfer.getAmount().getValue() * transferCommission, transferCurrency,
+//                balance, transferCurrency,
+                operationId);
+    }
+
+    @Override
+    public void cardDataValidation(Transfer transfer, Card validCardFrom) throws InvalidCardDataException {
+
+        boolean validTillIsCorrect = Objects.equals(validCardFrom.getCardValidTill(), transfer.getCardFromValidTill());
+        boolean cvvIsCorrect = Objects.equals(validCardFrom.getCardCVV(), transfer.getCardFromCVV());
+        if (!validTillIsCorrect || !cvvIsCorrect) {
+            throw new InvalidCardDataException("Введены неверные данные карты (срок действия / CVV номер)");
+        }
+
+//        String transferCurrency = transfer.getAmount().getCurrency();
+//        if (!validCardFrom.getAmounts().containsKey(transferCurrency)) {
+//            throw new InvalidCardDataException("На выбранной карте отсутствует счет в валюте " + transferCurrency);
+//        }
+
+//        Integer cardAvailableAmount = validCardFrom.getAmounts().get(transferCurrency).getValue();
+//        Integer transferAmountWithCommission = (int) (transfer.getAmount().getValue() * (1 + transferCommission));
+//        if (cardAvailableAmount < transferAmountWithCommission) {
+//            throw new InvalidCardDataException("На выбранной карте недостаточно средств. На карте имеется " +
+//                    cardAvailableAmount + ", необходимо (с учетом комиссии) " + transferAmountWithCommission);
+//        }
     }
 }

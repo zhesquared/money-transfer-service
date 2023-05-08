@@ -1,14 +1,15 @@
 package ru.netology.moneytransferservice.servise;
 
-import ru.netology.moneytransferservice.model.Account;
-import ru.netology.moneytransferservice.model.Card;
+import ru.netology.moneytransferservice.domain.Card;
+import ru.netology.moneytransferservice.domain.Transfer;
+import ru.netology.moneytransferservice.exceptions.InvalidCardDataException;
+import ru.netology.moneytransferservice.exceptions.InvalidConfirmationDataException;
+import ru.netology.moneytransferservice.responce.OperationConfirmation;
 
 public interface TransferService {
 
-    Card getCardByNumber(String cardNumber); //получаем данные карты по ее номеру
-
-    int getAccountBalance(Card card); //получаем баланс карты
-
-    boolean updateAccountBalance(Card card, int amount); //изменяем баланс карты
-
+    Long transfer(Transfer transfer) throws InvalidCardDataException;
+    boolean transferConfirmation(OperationConfirmation confirmation) throws InvalidConfirmationDataException;
+    void transferExecution(String operationId);
+    void cardDataValidation(Transfer transfer, Card validCardFrom) throws InvalidCardDataException;
 }

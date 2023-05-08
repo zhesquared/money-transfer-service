@@ -1,7 +1,10 @@
 package ru.netology.moneytransferservice.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import ru.netology.moneytransferservice.model.Card;
+import ru.netology.moneytransferservice.domain.Card;
 
-public interface CardRepository extends JpaRepository<Card, Integer> {
+import java.util.Optional;
+
+public interface CardRepository {
+
+    Optional<Card> getCardByNumber(String cardNumber);
 }
