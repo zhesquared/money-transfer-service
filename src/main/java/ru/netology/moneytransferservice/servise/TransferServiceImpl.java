@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.netology.moneytransferservice.domain.Amount;
 import ru.netology.moneytransferservice.domain.Card;
 import ru.netology.moneytransferservice.domain.Transfer;
 import ru.netology.moneytransferservice.exceptions.InvalidCardDataException;
 import ru.netology.moneytransferservice.exceptions.InvalidConfirmationDataException;
 import ru.netology.moneytransferservice.repository.CardRepository;
-import ru.netology.moneytransferservice.repository.NewCardRepository;
 import ru.netology.moneytransferservice.repository.TransferRepository;
 import ru.netology.moneytransferservice.responce.OperationConfirmation;
 
@@ -26,9 +26,6 @@ public class TransferServiceImpl implements TransferService {
     private static final Logger logger = LoggerFactory.getLogger("file-logger");
 
     @Autowired
-    private NewCardRepository newCardRepository;
-
-    @Autowired
     public TransferServiceImpl(@Value("${verification.code:0000}") String verificationCode,
                                @Value("${transfer.commission:0}") Double transferCommission,
                                TransferRepository transferRepository,
@@ -38,6 +35,7 @@ public class TransferServiceImpl implements TransferService {
         this.transferRepository = transferRepository;
         this.cardRepository = cardRepository;
     }
+
 
     @Override
     public Long transfer(Transfer transfer) throws InvalidCardDataException { //перевод
@@ -83,21 +81,24 @@ public class TransferServiceImpl implements TransferService {
         Transfer transfer = transferRepository.getTransferById(operationId);
         Card validCardFrom = cardRepository.getCardByNumber(transfer.getCardFromNumber()).get();
 
-//        String transferCurrency = transfer.getAmount().getCurrency();
-//        Integer transferAmountWithCommission = (int) (transfer.getAmount().getValue() * (1 + transferCommission));
-//        Integer balance = validCardFrom.getAmounts().get(transferCurrency).getValue() - transferAmountWithCommission;
+        String transferCurrency = transfer.getAmount().getCurrency();
+        Integer totalTransfer = (int) (transfer.getAmount().getValue() * (1 + transferCommission));
+        Integer balance = validCardFrom.getAmounts().get(transferCurrency).getValue() - totalTransfer;
 
-//        validCardFrom.getAmounts().put(transferCurrency, new Amount(balance, transferCurrency));
+        validCardFrom.getAmounts().put(transferCurrency, new Amount(balance, transferCurrency));
 
         logger.info("С карты {} успешно переведена сумма в размере {} на карту {}. Размер комиссии составил {} {}. " +
                         "Остаток на карте: {} {}. ID операции: {}",
-//                transfer.getCardFromNumber(),
-//                transfer.getAmount(),
-//                transfer.getCardToNumber(),
-//                transfer.getAmount().getValue() * transferCommission, transferCurrency,
-//                balance, transferCurrency,
+                transfer.getCardFromNumber(),
+                transfer.getAmount(),
+                transfer.getCardToNumber(),
+                transfer.getAmount().getValue() * transferCommission,
+                transferCurrency,
+                balance,
+                transferCurrency,
                 operationId);
     }
+
 
     @Override
     public void cardDataValidation(Transfer transfer, Card validCardFrom) throws InvalidCardDataException {
@@ -105,19 +106,21 @@ public class TransferServiceImpl implements TransferService {
         boolean validTillIsCorrect = Objects.equals(validCardFrom.getCardValidTill(), transfer.getCardFromValidTill());
         boolean cvvIsCorrect = Objects.equals(validCardFrom.getCardCVV(), transfer.getCardFromCVV());
         if (!validTillIsCorrect || !cvvIsCorrect) {
-            throw new InvalidCardDataException("Введены неверные данные карты (срок действия / CVV номер)");
+            throw new InvalidCardDataException("Неккоректные данные карты: срок действия или код cvv");
         }
 
-//        String transferCurrency = transfer.getAmount().getCurrency();
-//        if (!validCardFrom.getAmounts().containsKey(transferCurrency)) {
-//            throw new InvalidCardDataException("На выбранной карте отсутствует счет в валюте " + transferCurrency);
-//        }
+        String transferCurrency = transfer.getAmount().getCurrency();
+        if (!validCardFrom.getAmounts().containsKey(transferCurrency)) {
+            throw new InvalidCardDataException("К данной карте не привязан валютный счет в  " + transferCurrency);
+        }
 
-//        Integer cardAvailableAmount = validCardFrom.getAmounts().get(transferCurrency).getValue();
-//        Integer transferAmountWithCommission = (int) (transfer.getAmount().getValue() * (1 + transferCommission));
-//        if (cardAvailableAmount < transferAmountWithCommission) {
-//            throw new InvalidCardDataException("На выбранной карте недостаточно средств. На карте имеется " +
-//                    cardAvailableAmount + ", необходимо (с учетом комиссии) " + transferAmountWithCommission);
-//        }
+        Integer cardAvailableAmount = validCardFrom.getAmounts().get(transferCurrency).getValue();
+        Integer totalTransfer = (int) (transfer.getAmount().getValue() * (1 + transferCommission));
+        if (cardAvailableAmount < totalTransfer) {
+            throw new InvalidCardDataException("Недостаточно средств. Баланс " +
+                    cardAvailableAmount +
+                    ", небходимо для перевода " +
+                    totalTransfer);
+        }
     }
 }

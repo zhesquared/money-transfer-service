@@ -11,34 +11,58 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 public class CardRepositoryImpl implements CardRepository {
 
-    private final Map<String, Card> cards = new ConcurrentHashMap<>();
+    private final Map<String, Card> cardsData = new ConcurrentHashMap<>();
 
     {
-//        cards.put("1111222233334444", new Card("1111222233334444", "01/30", "111",
-//                new ConcurrentHashMap<>(Map.of("RUR", new Amount(50000, "RUR")))));
-//
-//        cards.put("9999888877776666", new Card("9999888877776666", "10/25", "222",
-//                new ConcurrentHashMap<>(Map.of("EUR", new Amount(100000, "EUR")))));
-//
-//        cards.put("1234567890123456", new Card("1234567890123456", "05/27", "333",
-//                new ConcurrentHashMap<>(Map.of("USD", new Amount(10000, "USD")))));
-//
-//        cards.put("1122334455667788", new Card("1122334455667788", "03/31", "444",
-//                new ConcurrentHashMap<>(Map.of(
-//                        "RUR", new Amount(150000, "RUR"),
-//                        "EUR", new Amount(20000, "EUR")
-//                ))));
-//
-//        cards.put("9876543210987654", new Card("9876543210987654", "08/24", "555",
-//                new ConcurrentHashMap<>(Map.of(
-//                        "RUR", new Amount(250000, "RUR"),
-//                        "USD", new Amount(5000, "USD"),
-//                        "EUR", new Amount(1000, "EUR")
-//                ))));
+        cardsData.put("4875131749697170",
+                new Card("4875131749697170", "12/23", "498", "Shcherbakov", "Mikhail",
+                        new ConcurrentHashMap<>(
+                                Map.of("RUR", new Amount(15220, "RUR"))
+                        )));
+        cardsData.put("4474958586817833",
+                new Card("4474958586817833", "09/27", "781", "Blinova", "Milana",
+                        new ConcurrentHashMap<>(
+                                Map.of("RUR", new Amount(3200, "RUR"))
+                        )));
+        cardsData.put("4935478279404040",
+                new Card("4935478279404040", "08/24", "695", "Evdokimov", "Anton",
+                        new ConcurrentHashMap<>(
+                                Map.of("RUR", new Amount(95325, "RUR"))
+                        )));
+        cardsData.put("4557530545127271",
+                new Card("4557530545127271", "09/25", "676", "Ryzhov", "Timur",
+                        new ConcurrentHashMap<>(
+                                Map.of("RUR", new Amount(945, "RUR"))
+                        )));
+        cardsData.put("4255043989582915",
+                new Card("4255043989582915", "01/28", "660", "Sokolova", "Polina",
+                        new ConcurrentHashMap<>(
+                                Map.of("RUR", new Amount(9812, "RUR"))
+                        )));
+        cardsData.put("5355234686061156",
+                new Card("5355234686061156", "08/24", "857", "Vasileva", "Kseniya",
+                        new ConcurrentHashMap<>(
+                                Map.of("RUR", new Amount(321548, "RUR"))
+                        )));
+        cardsData.put("5509190158858294",
+                new Card("5509190158858294", "05/26", "409", "Zuev", "Demid",
+                        new ConcurrentHashMap<>(
+                                Map.of("RUR", new Amount(2154, "RUR"))
+                        )));
+        cardsData.put("5224855342102882",
+                new Card("5224855342102882", "04/28", "539", "Avdeev", "Yaroslav",
+                        new ConcurrentHashMap<>(
+                                Map.of("RUR", new Amount(9841, "RUR"))
+                        )));
+        cardsData.put("5561903268892226",
+                new Card("5561903268892226", "08/23", "207", "Kozlova", "Mariya",
+                        new ConcurrentHashMap<>(
+                                Map.of("RUR", new Amount(205, "RUR"))
+                        )));
     }
 
     @Override
     public Optional<Card> getCardByNumber(String cardNumber) {
-        return Optional.ofNullable(cards.get(cardNumber));
+        return Optional.ofNullable(cardsData.get(cardNumber));
     }
 }

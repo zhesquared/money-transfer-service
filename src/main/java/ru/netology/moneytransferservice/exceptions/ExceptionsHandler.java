@@ -11,26 +11,26 @@ import ru.netology.moneytransferservice.responce.OperationReject;
 @RestControllerAdvice
 public class ExceptionsHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger("file-logger"); //инициализация логгера
+    private static final Logger logger = LoggerFactory.getLogger("file-logger");
 
     @ExceptionHandler(
             {InvalidConfirmationDataException.class,
                     InvalidCardDataException.class})
     public ResponseEntity<OperationReject> handleInvalidDataException(Exception exception) {
-        return exceptionResponse(exception, HttpStatus.BAD_REQUEST); //обработчик ошибок
+        return exceptionResponse(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     public ResponseEntity<OperationReject> handleUnknownException(Exception exception) {
-        return exceptionResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR); //обработка неизвестной ошибки
+        return exceptionResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public ResponseEntity<OperationReject> exceptionResponse(Exception exception, HttpStatus httpStatus) {
 
-        int exceptionId = OperationReject.idCounter.incrementAndGet(); //номер ошибки
+        int exceptionId = OperationReject.idCounter.incrementAndGet();
         String exceptionMessage = exception.getMessage();
 
-        logger.error(exceptionId + ": " + exceptionMessage);
+        logger.error(exceptionId + " [" + exceptionMessage + "]");
 
         return new ResponseEntity<>(new OperationReject(exceptionId, exceptionMessage), httpStatus);
     }
