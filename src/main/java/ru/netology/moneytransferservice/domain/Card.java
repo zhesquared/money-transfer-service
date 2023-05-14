@@ -12,6 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Card {
+
     private String cardNumber;
     private String cardValidTill;
     private String cardCVV;

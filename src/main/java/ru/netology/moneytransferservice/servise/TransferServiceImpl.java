@@ -82,21 +82,25 @@ public class TransferServiceImpl implements TransferService {
         Card validCardFrom = cardRepository.getCardByNumber(transfer.getCardFromNumber()).get();
 
         String transferCurrency = transfer.getAmount().getCurrency();
-        Integer totalTransfer = (int) (transfer.getAmount().getValue() * (1 + transferCommission));
-        Integer balance = validCardFrom.getAmounts().get(transferCurrency).getValue() - totalTransfer;
+        Double totalTransfer = (transfer.getAmount().getValue() * (1 + transferCommission)) / 100;
+        Double balance = validCardFrom.getAmounts().get(transferCurrency).getValue() - totalTransfer;
 
         validCardFrom.getAmounts().put(transferCurrency, new Amount(balance, transferCurrency));
 
-        logger.info("С карты {} успешно переведена сумма в размере {} на карту {}. Размер комиссии составил {} {}. " +
-                        "Остаток на карте: {} {}. ID операции: {}",
+        logger.info("ID: {}. " +
+                        "Перевод с карты: {}, " +
+                        "сумма перевода: {}, " +
+                        "карта получателя: {}, " +
+                        "размер комиссии: {} {}, " +
+                        "остаток на карте: {} {}.",
+                operationId,
                 transfer.getCardFromNumber(),
                 transfer.getAmount(),
                 transfer.getCardToNumber(),
-                transfer.getAmount().getValue() * transferCommission,
+                transfer.getAmount().getValue() * transferCommission / 100,
                 transferCurrency,
                 balance,
-                transferCurrency,
-                operationId);
+                transferCurrency);
     }
 
 
@@ -114,8 +118,8 @@ public class TransferServiceImpl implements TransferService {
             throw new InvalidCardDataException("К данной карте не привязан валютный счет в  " + transferCurrency);
         }
 
-        Integer cardAvailableAmount = validCardFrom.getAmounts().get(transferCurrency).getValue();
-        Integer totalTransfer = (int) (transfer.getAmount().getValue() * (1 + transferCommission));
+        Double cardAvailableAmount = validCardFrom.getAmounts().get(transferCurrency).getValue();
+        Double totalTransfer = (transfer.getAmount().getValue() * (1 + transferCommission)) / 100;
         if (cardAvailableAmount < totalTransfer) {
             throw new InvalidCardDataException("Недостаточно средств. Баланс " +
                     cardAvailableAmount +

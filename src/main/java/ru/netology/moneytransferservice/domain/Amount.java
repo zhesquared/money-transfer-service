@@ -1,27 +1,21 @@
 package ru.netology.moneytransferservice.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
 @Getter
 @Setter
-@NoArgsConstructor
+@AllArgsConstructor
 public class Amount {
-    private Integer value;
-    private String currency;
 
-    public Amount(Integer value, String currency) {
-        this.value = value;
-        this.currency = currency;
-    }
+    private Double value;
+    private String currency;
 
     @Override
     public String toString() {
-        return "Amount{" +
-                "value=" + value +
-                ", currency='" + currency + '\'' +
-                '}';
+        return value / 100 +
+                ", валюта: " + currency;
     }
 }

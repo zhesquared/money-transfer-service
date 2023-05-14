@@ -8,6 +8,8 @@ import ru.netology.moneytransferservice.responce.OperationConfirmation;
 public interface TransferRepository {
 
     Long addTransfer(Transfer transfer);
+
     boolean confirmOperation(OperationConfirmation confirmation);
+
     Transfer getTransferById(String id);
 }
