@@ -34,7 +34,7 @@ public class TransferIntegrationTest {
     @Test
     @Order(1)
     void testTransferWhenValidThenReturnOperationId() {
-        Transfer validTransfer = new Transfer("4474958586817833", "09/27", //корректный номер
+        Transfer validTransfer = new Transfer("4474958586817833", "09/27",
                 "498", "4875131749697170", new Amount(3_000.0, "RUR"));
 
         ResponseEntity<String> backendEntity = restTemplate.postForEntity(
