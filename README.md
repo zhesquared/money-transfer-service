@@ -8,7 +8,7 @@ ___
 * Gradle;
 * Lombok;
 * Docker;
-* Logback
+* Logback;
 * JUnit;
 * Mockito;
 * Truth;
@@ -19,7 +19,7 @@ ___
 ___
 
 **Сервис перевода денег** - простое приложение - сервис для перевода денежных средств с карты на карту.
-**Backend** реализован на основе **Spring Boot** и написан на **Java**, **frontend** - написан на **TypeScript** с использованием **React** (доступен по [ссылке](https://github.com/netology-code/jd-homeworks/blob/master/diploma/moneytransferservice.md)).
+**Backend** реализован на основе **Spring Boot** и написан на **Java**, **frontend** - написан на **TypeScript** с использованием **React** (доступен по [ссылке](https://github.com/serp-ya/card-transfer)).
 
 ___
 #### 3. Описание серверной части приложения
