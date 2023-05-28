@@ -1,4 +1,0 @@
-rootProject.name = 'money-transfer-service'
-
-include 'backend'
-include 'frontend'
