@@ -5,4 +5,5 @@ public record Transfer(
         String cardFromValidTill,
         String cardFromCVV,
         String cardToNumber,
-        Amount amount) {}
+        Amount amount) {
+}

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -22,6 +21,8 @@ import ru.netology.moneytransferservice.servise.TransferServiceImpl;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
@@ -46,24 +47,24 @@ public class TransferServiceTest {
     }
 
     @Test
-    public void testTransferWhenValidTransferThenReturnOperationId() throws InvalidCardDataException {
-        Mockito.when(transferRepository.addTransfer(VALID_TRANSFER)).thenReturn(1L);
-        Mockito.when(cardRepository.getCardByNumber(VALID_TRANSFER.getCardFromNumber()))
+    public void testTransferWhenValidTransferThenReturnOperationId() {
+        when(transferRepository.addTransfer(VALID_TRANSFER)).thenReturn(1L);
+        when(cardRepository.getCardByNumber(VALID_TRANSFER.cardFromNumber()))
                 .thenReturn(Optional.of(VALID_CARD));
 
-        Long operationId = transferService.transfer(VALID_TRANSFER);
+        Long operationId = Long.valueOf(transferService.transfer(VALID_TRANSFER).getOperationId());
 
         Assertions.assertEquals(1, operationId);
     }
 
     @Test
-    public void testTransferWhenInvalidCardTransferThenThrowEx() throws InvalidCardDataException {
+    public void testTransferWhenInvalidCardTransferThenThrowEx() {
         Transfer invalidCardTransfer = new Transfer(
                 "9999888877776666", "01/25", "555", "5509190158858294",
                 new Amount(50_000.0, "RUR"));
-        String cardFromNumber = invalidCardTransfer.getCardFromNumber();
+        String cardFromNumber = invalidCardTransfer.cardFromNumber();
 
-        Mockito.when(cardRepository.getCardByNumber(invalidCardTransfer.getCardFromNumber()))
+        when(cardRepository.getCardByNumber(invalidCardTransfer.cardFromNumber()))
                 .thenReturn(Optional.empty());
 
         Exception ex = Assertions.assertThrows(InvalidCardDataException.class,

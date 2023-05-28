@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.netology.moneytransferservice.domain.Transfer;
-import ru.netology.moneytransferservice.exceptions.InvalidCardDataException;
 import ru.netology.moneytransferservice.exceptions.InvalidConfirmationDataException;
 import ru.netology.moneytransferservice.responce.ConfirmationSuccess;
 import ru.netology.moneytransferservice.responce.OperationConfirmation;

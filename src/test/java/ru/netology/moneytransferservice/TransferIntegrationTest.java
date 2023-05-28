@@ -4,7 +4,8 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -17,7 +18,6 @@ import ru.netology.moneytransferservice.domain.Transfer;
 import ru.netology.moneytransferservice.responce.OperationConfirmation;
 
 @Testcontainers
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TransferIntegrationTest {
 
@@ -25,14 +25,13 @@ public class TransferIntegrationTest {
     TestRestTemplate restTemplate;
     private static final int PORT = 9999;
     @Container
-    private static final GenericContainer<?> backend = new GenericContainer<>("backend")
+    private static final GenericContainer<?> backend = new GenericContainer<>("app")
             .withExposedPorts(8080)
             .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
                     new HostConfig().withPortBindings(
                             new PortBinding(Ports.Binding.bindPort(PORT), new ExposedPort(8080)))));
 
     @Test
-    @Order(1)
     void testTransferWhenValidThenReturnOperationId() {
         Transfer validTransfer = new Transfer("4474958586817833", "09/27",
                 "498", "4875131749697170", new Amount(3_000.0, "RUR"));
@@ -44,7 +43,6 @@ public class TransferIntegrationTest {
         Assertions.assertEquals("{\"operationId\":\"1\"}", response);
     }
 
-    @Order(2)
     @Test
     void testTransferWithIncorrectCardDataThenReturnError() {
         Transfer invalidCardTransfer = new Transfer("9999888877771111", "12/34",
@@ -60,7 +58,6 @@ public class TransferIntegrationTest {
                 response);
     }
 
-    @Order(3)
     @Test
     void testConfirmationWhenCorrectIdThenReturnOperationId() {
         OperationConfirmation validConfirmation = new OperationConfirmation("0000", "1");
@@ -72,7 +69,6 @@ public class TransferIntegrationTest {
         Assertions.assertEquals("{\"operationId\":\"1\"}", response);
     }
 
-    @Order(4)
     @Test
     void testConfirmationWhenInvalidCodeThenReturnError() {
         OperationConfirmation invalidCodeConfirmation = new OperationConfirmation("1111", "1");
@@ -84,7 +80,6 @@ public class TransferIntegrationTest {
         Assertions.assertEquals("Неверный код подтверждения 1111!", response);
     }
 
-    @Order(5)
     @Test
     void testConfirmationWhenInvalidOperationIdThenReturnError() {
         OperationConfirmation invalidOperationIdConfirmation = new OperationConfirmation("0000", "5");

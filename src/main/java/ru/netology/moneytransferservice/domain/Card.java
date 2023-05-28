@@ -8,4 +8,5 @@ public record Card(
         String cardCVV,
         String cardholderName,
         String cardholderSurname,
-        Map<String, Amount> amounts) {}
+        Map<String, Amount> amounts) {
+}

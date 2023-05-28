@@ -1,6 +1,5 @@
 package ru.netology.moneytransferservice.servise;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.netology.moneytransferservice.domain.Card;
 import ru.netology.moneytransferservice.domain.Transfer;

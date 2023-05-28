@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -23,6 +22,8 @@ import ru.netology.moneytransferservice.servise.TransferServiceImpl;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
@@ -52,10 +53,10 @@ public class TransferServiceConfirmationTest {
     public void testConfirmWhenValidOperationThenReturnTrue() throws InvalidConfirmationDataException {
         OperationConfirmation validConfirmation = new OperationConfirmation("0000", "1");
 
-        Mockito.when(transferRepository.confirmOperation(validConfirmation)).thenReturn(true);
-        Mockito.when(transferRepository.getTransferById(validConfirmation.getOperationId()))
+        when(transferRepository.confirmOperation(validConfirmation)).thenReturn(true);
+        when(transferRepository.getTransferById(validConfirmation.getOperationId()))
                 .thenReturn(VALID_TRANSFER);
-        Mockito.when(cardRepository.getCardByNumber(VALID_TRANSFER.getCardFromNumber()))
+        when(cardRepository.getCardByNumber(VALID_TRANSFER.cardFromNumber()))
                 .thenReturn(Optional.of(VALID_CARD));
 
         boolean result = transferService.transferConfirmation(validConfirmation);
@@ -69,14 +70,14 @@ public class TransferServiceConfirmationTest {
         Exception ex = Assertions.assertThrows(InvalidConfirmationDataException.class,
                 () -> transferService.transferConfirmation(invalidCodeConfirmation));
 
-        Truth.assertThat(ex).hasMessageThat().contains("Неверный код подтверждения!");
+        Truth.assertThat(ex).hasMessageThat().contains("Неверный код подтверждения [1111]!");
     }
 
     @Test
     public void testConfirmWhenInvalidOperationConfirmationThenThrowEx() {
         OperationConfirmation invalidOperationConfirmation = new OperationConfirmation("0000", "99");
 
-        Mockito.when(transferRepository.confirmOperation(invalidOperationConfirmation)).thenReturn(false);
+        when(transferRepository.confirmOperation(invalidOperationConfirmation)).thenReturn(false);
 
         Exception ex = Assertions.assertThrows(InvalidConfirmationDataException.class,
                 () -> transferService.transferConfirmation(invalidOperationConfirmation));

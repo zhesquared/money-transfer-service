@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.netology.moneytransferservice.domain.Amount;
-import ru.netology.moneytransferservice.domain.Card;
 import ru.netology.moneytransferservice.domain.Transfer;
 import ru.netology.moneytransferservice.exceptions.InvalidCardDataException;
 import ru.netology.moneytransferservice.exceptions.InvalidConfirmationDataException;
