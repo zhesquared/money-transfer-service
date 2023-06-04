@@ -1,6 +1,5 @@
 package ru.netology.moneytransferservice;
 
-import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,16 +12,18 @@ import org.springframework.test.util.ReflectionTestUtils;
 import ru.netology.moneytransferservice.domain.Amount;
 import ru.netology.moneytransferservice.domain.Card;
 import ru.netology.moneytransferservice.domain.Transfer;
-import ru.netology.moneytransferservice.exceptions.InvalidConfirmationDataException;
+import ru.netology.moneytransferservice.dto.OperationConfirmation;
+import ru.netology.moneytransferservice.exception.InvalidConfirmationDataException;
 import ru.netology.moneytransferservice.repository.CardRepository;
 import ru.netology.moneytransferservice.repository.TransferRepository;
-import ru.netology.moneytransferservice.responce.OperationConfirmation;
 import ru.netology.moneytransferservice.servise.TransferServiceImpl;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -60,7 +61,7 @@ public class TransferServiceConfirmationTest {
                 .thenReturn(Optional.of(VALID_CARD));
 
         boolean result = transferService.transferConfirmation(validConfirmation);
-        Assertions.assertTrue(result);
+        assertTrue(result);
     }
 
     @Test
@@ -70,7 +71,7 @@ public class TransferServiceConfirmationTest {
         Exception ex = Assertions.assertThrows(InvalidConfirmationDataException.class,
                 () -> transferService.transferConfirmation(invalidCodeConfirmation));
 
-        Truth.assertThat(ex).hasMessageThat().contains("Неверный код подтверждения [1111]!");
+        assertThat(ex).hasMessageThat().contains("Неверный код подтверждения [1111]!");
     }
 
     @Test
@@ -82,6 +83,6 @@ public class TransferServiceConfirmationTest {
         Exception ex = Assertions.assertThrows(InvalidConfirmationDataException.class,
                 () -> transferService.transferConfirmation(invalidOperationConfirmation));
 
-        Truth.assertThat(ex).hasMessageThat().contains("Транзакции с идентификатором [99] не существует");
+        assertThat(ex).hasMessageThat().contains("Транзакции с идентификатором [99] не существует");
     }
 }

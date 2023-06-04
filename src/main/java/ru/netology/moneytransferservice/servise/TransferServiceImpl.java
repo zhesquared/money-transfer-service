@@ -1,5 +1,6 @@
 package ru.netology.moneytransferservice.servise;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,35 +8,28 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.netology.moneytransferservice.domain.Amount;
 import ru.netology.moneytransferservice.domain.Transfer;
-import ru.netology.moneytransferservice.exceptions.InvalidCardDataException;
-import ru.netology.moneytransferservice.exceptions.InvalidConfirmationDataException;
+import ru.netology.moneytransferservice.dto.OperationConfirmation;
+import ru.netology.moneytransferservice.dto.TransferSuccess;
+import ru.netology.moneytransferservice.exception.InvalidCardDataException;
+import ru.netology.moneytransferservice.exception.InvalidConfirmationDataException;
 import ru.netology.moneytransferservice.repository.CardRepository;
 import ru.netology.moneytransferservice.repository.TransferRepository;
-import ru.netology.moneytransferservice.responce.OperationConfirmation;
-import ru.netology.moneytransferservice.responce.TransferSuccess;
+
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class TransferServiceImpl implements TransferService {
 
-    private final String verificationCode;
-    private final Double transferCommission;
+    @Value("${verification.code}")
+    private String verificationCode;
+    @Value("${transfer.commission}")
+    private Double transferCommission;
     private final TransferRepository transferRepository;
     private final CardRepository cardRepository;
     private final CardDataValidation cardDataValidation;
 
     private static final Logger logger = LoggerFactory.getLogger("file-logger");
-
-    private TransferServiceImpl(@Value("${verification.code:0000}") String verificationCode,
-                                @Value("${transfer.commission:0}") Double transferCommission,
-                                TransferRepository transferRepository,
-                                CardRepository cardRepository, CardDataValidation cardDataValidation) {
-        this.verificationCode = verificationCode;
-        this.transferCommission = transferCommission;
-        this.transferRepository = transferRepository;
-        this.cardRepository = cardRepository;
-        this.cardDataValidation = cardDataValidation;
-    }
-
 
     @SneakyThrows
     @Override
@@ -47,11 +41,11 @@ public class TransferServiceImpl implements TransferService {
                 .orElseThrow(
                         () -> new InvalidCardDataException(
                                 String.format("Карты с номером [%s] не существует. Попробуйте еще раз.", cardFromNumber)));
-
-        cardDataValidation.validTillValidation(transfer, validCardFrom);
-        cardDataValidation.CVVValidation(transfer, validCardFrom);
-        cardDataValidation.transferCurrencyValidation(transfer, validCardFrom);
-        cardDataValidation.cardAvailableAmountValidation(transfer, validCardFrom, this.transferCommission);
+        Optional.of(validCardFrom)
+                .filter(card -> cardDataValidation.validTillValidation(transfer, card))
+                .filter(card -> cardDataValidation.CVVValidation(transfer, card))
+                .filter(card -> cardDataValidation.transferCurrencyValidation(transfer, card))
+                .filter(card -> cardDataValidation.cardAvailableAmountValidation(transfer, card, this.transferCommission));
 
         return new TransferSuccess(String.valueOf(transferRepository.addTransfer(transfer)));
     }

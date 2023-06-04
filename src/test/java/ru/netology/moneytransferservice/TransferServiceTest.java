@@ -1,6 +1,5 @@
 package ru.netology.moneytransferservice;
 
-import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import ru.netology.moneytransferservice.domain.Amount;
 import ru.netology.moneytransferservice.domain.Card;
 import ru.netology.moneytransferservice.domain.Transfer;
-import ru.netology.moneytransferservice.exceptions.InvalidCardDataException;
+import ru.netology.moneytransferservice.exception.InvalidCardDataException;
 import ru.netology.moneytransferservice.repository.CardRepository;
 import ru.netology.moneytransferservice.repository.TransferRepository;
 import ru.netology.moneytransferservice.servise.TransferServiceImpl;
@@ -22,6 +21,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -53,8 +54,9 @@ public class TransferServiceTest {
                 .thenReturn(Optional.of(VALID_CARD));
 
         Long operationId = Long.valueOf(transferService.transfer(VALID_TRANSFER).getOperationId());
+        Long idExp = 1L;
 
-        Assertions.assertEquals(1, operationId);
+        assertEquals(idExp, operationId);
     }
 
     @Test
@@ -70,6 +72,6 @@ public class TransferServiceTest {
         Exception ex = Assertions.assertThrows(InvalidCardDataException.class,
                 () -> transferService.transfer(invalidCardTransfer));
 
-        Truth.assertThat(ex).hasMessageThat().contains("Карты с номером [" + cardFromNumber + "] не существует. Попробуйте еще раз.");
+        assertThat(ex).hasMessageThat().contains("Карты с номером [" + cardFromNumber + "] не существует. Попробуйте еще раз.");
     }
 }

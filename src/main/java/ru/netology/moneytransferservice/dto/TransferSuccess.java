@@ -1,11 +1,11 @@
-package ru.netology.moneytransferservice.responce;
+package ru.netology.moneytransferservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ConfirmationSuccess {
+public class TransferSuccess {
 
     private String operationId;
 }

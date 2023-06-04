@@ -2,7 +2,7 @@ package ru.netology.moneytransferservice.repository;
 
 import org.springframework.stereotype.Repository;
 import ru.netology.moneytransferservice.domain.Transfer;
-import ru.netology.moneytransferservice.responce.OperationConfirmation;
+import ru.netology.moneytransferservice.dto.OperationConfirmation;
 
 @Repository
 public interface TransferRepository {

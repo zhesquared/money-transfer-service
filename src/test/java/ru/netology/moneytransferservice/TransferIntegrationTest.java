@@ -4,7 +4,6 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +14,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.netology.moneytransferservice.domain.Amount;
 import ru.netology.moneytransferservice.domain.Transfer;
-import ru.netology.moneytransferservice.responce.OperationConfirmation;
+import ru.netology.moneytransferservice.dto.OperationConfirmation;
+
+import static org.junit.Assert.assertEquals;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -40,7 +41,7 @@ public class TransferIntegrationTest {
                 "http://localhost:" + PORT + "/transfer", validTransfer, String.class);
         String response = backendEntity.getBody();
 
-        Assertions.assertEquals("{\"operationId\":\"1\"}", response);
+        assertEquals("{\"operationId\":\"1\"}", response);
     }
 
     @Test
@@ -52,7 +53,7 @@ public class TransferIntegrationTest {
                 "http://localhost:" + PORT + "/transfer", invalidCardTransfer, String.class);
         String response = backendEntity.getBody();
 
-        Assertions.assertEquals("Карты с номером [" +
+        assertEquals("Карты с номером [" +
                         "9999888877771111" +
                         "] не существует. Попробуйте еще раз.",
                 response);
@@ -66,7 +67,7 @@ public class TransferIntegrationTest {
                 "http://localhost:" + PORT + "/confirmOperation", validConfirmation, String.class);
         String response = backendEntity.getBody();
 
-        Assertions.assertEquals("{\"operationId\":\"1\"}", response);
+        assertEquals("{\"operationId\":\"1\"}", response);
     }
 
     @Test
@@ -77,7 +78,7 @@ public class TransferIntegrationTest {
                 "http://localhost:" + PORT + "/confirmOperation", invalidCodeConfirmation, String.class);
         String response = backendEntity.getBody();
 
-        Assertions.assertEquals("Неверный код подтверждения 1111!", response);
+        assertEquals("Неверный код подтверждения 1111!", response);
     }
 
     @Test
@@ -88,6 +89,6 @@ public class TransferIntegrationTest {
                 "http://localhost:" + PORT + "/confirmOperation", invalidOperationIdConfirmation, String.class);
         String response = backendEntity.getBody();
 
-        Assertions.assertEquals("Транзакции с идентификатором [5] не существует", response);
+        assertEquals("Транзакции с идентификатором [5] не существует", response);
     }
 }

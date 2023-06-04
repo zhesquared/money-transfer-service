@@ -1,4 +1,4 @@
-package ru.netology.moneytransferservice.exceptions;
+package ru.netology.moneytransferservice.exception;
 
 public class InvalidConfirmationDataException extends Exception {
 

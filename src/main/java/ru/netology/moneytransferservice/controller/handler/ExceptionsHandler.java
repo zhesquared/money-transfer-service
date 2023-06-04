@@ -1,4 +1,4 @@
-package ru.netology.moneytransferservice.exceptions.handlers;
+package ru.netology.moneytransferservice.controller.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.netology.moneytransferservice.exceptions.InvalidCardDataException;
-import ru.netology.moneytransferservice.exceptions.InvalidConfirmationDataException;
-import ru.netology.moneytransferservice.responce.OperationReject;
+import ru.netology.moneytransferservice.exception.InvalidCardDataException;
+import ru.netology.moneytransferservice.exception.InvalidConfirmationDataException;
+import ru.netology.moneytransferservice.dto.OperationReject;
 
 @RestControllerAdvice
 public class ExceptionsHandler {

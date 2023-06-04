@@ -1,6 +1,5 @@
 package ru.netology.moneytransferservice;
 
-import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -10,12 +9,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.netology.moneytransferservice.domain.Amount;
 import ru.netology.moneytransferservice.domain.Card;
 import ru.netology.moneytransferservice.domain.Transfer;
-import ru.netology.moneytransferservice.exceptions.InvalidCardDataException;
+import ru.netology.moneytransferservice.exception.InvalidCardDataException;
 import ru.netology.moneytransferservice.servise.CardDataValidationImpl;
 import ru.netology.moneytransferservice.servise.TransferServiceImpl;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.google.common.truth.Truth.assertThat;
 
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
@@ -37,7 +38,7 @@ public class TransferServiceCardValidationTest {
         Exception exception = Assertions.assertThrows(InvalidCardDataException.class,
                 () -> cardDataValidation.validTillValidation(incorrectTillDate, VALID_CARD));
 
-        Truth.assertThat(exception).hasMessageThat().contains("Неккоректные данные карты: срок действия или код CVV");
+        assertThat(exception).hasMessageThat().contains("Неккоректные данные карты: срок действия или код CVV");
     }
 
     @Test
@@ -49,7 +50,7 @@ public class TransferServiceCardValidationTest {
         Exception exception = Assertions.assertThrows(InvalidCardDataException.class,
                 () -> cardDataValidation.CVVValidation(invalidCVV, VALID_CARD));
 
-        Truth.assertThat(exception).hasMessageThat().contains("Неккоректные данные карты: срок действия или код CVV");
+        assertThat(exception).hasMessageThat().contains("Неккоректные данные карты: срок действия или код CVV");
     }
 
     @Test
@@ -62,6 +63,6 @@ public class TransferServiceCardValidationTest {
         Exception exception = Assertions.assertThrows(InvalidCardDataException.class,
                 () -> cardDataValidation.transferCurrencyValidation(invalidCurrency, VALID_CARD));
 
-        Truth.assertThat(exception).hasMessageThat().contains(String.format("К данной карте не привязан валютный счет в %s", transferCurrency));
+        assertThat(exception).hasMessageThat().contains(String.format("К данной карте не привязан валютный счет в %s", transferCurrency));
     }
 }
